@@ -25,9 +25,15 @@ public class Panel extends JPanel implements Runnable {
     ArrayList<Integer> yRandom = new ArrayList<>();
 
     public boolean minesGenerated = false;
+    private int xRemainder;
+    private int yRemainder;
+    private int xSquareSelect;
+    private int ySquareSelect;
 
     Thread gameThread; // clk
     MouseHandler mouseHandler = new MouseHandler();
+
+    public boolean gameOn = true;
 
     public Panel() {
         this.setPreferredSize(new Dimension(screenWidth, screenLength));
@@ -45,19 +51,18 @@ public class Panel extends JPanel implements Runnable {
     @Override
     public void run() {
         double waitTime = (1000000000) / fps;
-        System.out.println("testing run");
         double nextPaintTime = System.nanoTime() + waitTime;
         if (!minesGenerated) {
             randomMines();
             System.out.println(xRandom);
             System.out.println(yRandom);
-            System.out.println("testing random mines inside run");
             minesGenerated = true;
         }
-        while (gameThread != null) { // fps = number of iterations per second
+        while (gameThread != null && gameOn) { // fps = number of iterations per second
             
             update();
             repaint();
+            floodFill();
 
 
             try {
@@ -95,11 +100,11 @@ public class Panel extends JPanel implements Runnable {
             }
         }
         if (mouseHandler.xPosition != 0) {
-            int xRemainder = mouseHandler.xPosition % bigTile;
-            int yRemainder = mouseHandler.yPosition % bigTile;
+            xRemainder = mouseHandler.xPosition % bigTile;
+            yRemainder = mouseHandler.yPosition % bigTile;
 
-            int xSquareSelect = mouseHandler.xPosition - xRemainder;
-            int ySquareSelect = mouseHandler.yPosition - yRemainder;
+            xSquareSelect = mouseHandler.xPosition - xRemainder;
+            ySquareSelect = mouseHandler.yPosition - yRemainder;
 
             graphics2.setColor(lightBrownSquare);
             graphics2.fillRect(xSquareSelect, ySquareSelect, bigTile, bigTile);
@@ -125,7 +130,7 @@ public class Panel extends JPanel implements Runnable {
                     xIndexMatching.add(inner);
                 }
                 else {
-                    
+
                 }
             }
         }
@@ -143,5 +148,27 @@ public class Panel extends JPanel implements Runnable {
                 }
             }
         }
+    }
+
+    public void floodFill() {
+        ArrayList<Integer> xEightCheck = new ArrayList<>(); // checking eight surrounding squares for mines
+        ArrayList<Integer> yEightCheck = new ArrayList<>();
+        for (int i = -1; i < 2; i++) {
+            xEightCheck.add(xSquareSelect - i);
+            for (int j = -1; j < 2; j++) {
+                yEightCheck.add(ySquareSelect - j);
+            }
+        }
+
+
+        for (int j = 0; j < xRandom.size() - 1; j++) {
+            if ((xSquareSelect / bigTile) == xRandom.get(j) && (ySquareSelect / bigTile) == yRandom.get(j)) {                    
+                System.out.println("GAME OVER");
+                gameOn = false;
+                return;
+            }
+            else {
+            }
+        }   
     }
 }
