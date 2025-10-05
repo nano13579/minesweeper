@@ -9,12 +9,13 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
 
-        Panel Panel = new Panel();
-        frame.add(Panel);
+        Panel panel = new Panel();
+        frame.add(panel);
         frame.pack();
 
         frame.setVisible(true);
 
+        panel.startThread();
     }
 
 }
