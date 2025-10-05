@@ -24,7 +24,7 @@ public class Panel extends JPanel implements Runnable {
     ArrayList<Integer> xRandom = new ArrayList<>();
     ArrayList<Integer> yRandom = new ArrayList<>();
 
-    private volatile boolean minesGenerated = false;
+    public boolean minesGenerated = false;
 
     Thread gameThread; // clk
     MouseHandler mouseHandler = new MouseHandler();
@@ -45,11 +45,13 @@ public class Panel extends JPanel implements Runnable {
     @Override
     public void run() {
         double waitTime = (1000000000) / fps;
+        System.out.println("testing run");
         double nextPaintTime = System.nanoTime() + waitTime;
         if (!minesGenerated) {
             randomMines();
-            // System.out.println(xRandom);
-            // System.out.println(yRandom);
+            System.out.println(xRandom);
+            System.out.println(yRandom);
+            System.out.println("testing random mines inside run");
             minesGenerated = true;
         }
         while (gameThread != null) { // fps = number of iterations per second
@@ -107,7 +109,8 @@ public class Panel extends JPanel implements Runnable {
     }
 
     public void randomMines() {
-
+        xRandom.clear();
+        yRandom.clear();
         ArrayList<Integer> xIndexMatching = new ArrayList<>();
 
         for(int i = 0; i < medNumMines; i ++) {
@@ -117,7 +120,7 @@ public class Panel extends JPanel implements Runnable {
 
         for(int outer = 0; outer < medNumMines; outer ++) { // checking for mine repeats in X dir
             for (int inner = 0; inner < medNumMines; inner ++) {
-                if (xRandom.get(outer) == xRandom.get(inner)) {
+                if (outer != inner && xRandom.get(outer).equals(xRandom.get(inner))) {
                     xIndexMatching.add(outer);
                     xIndexMatching.add(inner);
                 }
