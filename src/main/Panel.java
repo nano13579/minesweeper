@@ -3,8 +3,9 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.util.ArrayList;
 
-public class Panel extends JPanel implements Runnable{
+public class Panel extends JPanel implements Runnable {
 
     final int miniTile = 16;
     final int scale = 3;
@@ -91,5 +92,40 @@ public class Panel extends JPanel implements Runnable{
 
         }
         graphics2.dispose(); // save memory
+    }
+
+    public void randomMines() {
+        ArrayList<Integer> xRandom = new ArrayList<>();
+        ArrayList<Integer> yRandom = new ArrayList<>();
+        ArrayList<Integer> xIndexMatching = new ArrayList<>();
+        for(int i = 0; i < medNumMines; i ++) {
+            xRandom.add((int)Math.random() * 16);
+            yRandom.add((int)Math.random() * 16);
+        }
+        for(int outer = 0; outer < medNumMines; outer ++) { // checking for mine repeats in X dir
+            for (int inner = 0; inner < medNumMines; inner ++) {
+                if (xRandom.get(outer) == xRandom.get(inner)) {
+                    xIndexMatching.add(outer);
+                    xIndexMatching.add(inner);
+                }
+                else {
+                    
+                }
+            }
+        
+        for(int j = 0; j < xIndexMatching.size(); j = j + 2) { // removing repeats
+            if(yRandom.get(xIndexMatching.get(j)) == yRandom.get(xIndexMatching.get(j+1))) {
+                for (int i = 0; i < 1; ) {
+                    yRandom.set(xIndexMatching.get(j), (int)Math.random() * 16);
+                    if (yRandom.get(xIndexMatching.get(j)) != yRandom.get(xIndexMatching.get(j+1))) {
+                        i++;
+                    }
+                    else {
+                        
+                    }
+                }
+            }
+        }
+    }
     }
 }
