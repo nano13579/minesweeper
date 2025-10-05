@@ -21,6 +21,11 @@ public class Panel extends JPanel implements Runnable {
     final Color lightBrownSquare = new Color(222, 207, 180);
     final Color darkBrownSquare = new Color(193, 173, 144);
 
+    ArrayList<Integer> xRandom = new ArrayList<>();
+    ArrayList<Integer> yRandom = new ArrayList<>();
+
+    private volatile boolean minesGenerated = false;
+
     Thread gameThread; // clk
     MouseHandler mouseHandler = new MouseHandler();
 
@@ -39,12 +44,19 @@ public class Panel extends JPanel implements Runnable {
 
     @Override
     public void run() {
-        double waitTime = (1 * 10^9) / fps;
+        double waitTime = (1000000000) / fps;
         double nextPaintTime = System.nanoTime() + waitTime;
+        if (!minesGenerated) {
+            randomMines();
+            // System.out.println(xRandom);
+            // System.out.println(yRandom);
+            minesGenerated = true;
+        }
         while (gameThread != null) { // fps = number of iterations per second
             
             update();
             repaint();
+
 
             try {
                 double timeLeft = nextPaintTime - System.nanoTime();
@@ -95,13 +107,14 @@ public class Panel extends JPanel implements Runnable {
     }
 
     public void randomMines() {
-        ArrayList<Integer> xRandom = new ArrayList<>();
-        ArrayList<Integer> yRandom = new ArrayList<>();
+
         ArrayList<Integer> xIndexMatching = new ArrayList<>();
+
         for(int i = 0; i < medNumMines; i ++) {
-            xRandom.add((int)Math.random() * 16);
-            yRandom.add((int)Math.random() * 16);
+            xRandom.add((int)(Math.random() * (screenWidth / bigTile)));
+            yRandom.add((int)(Math.random() * (screenLength / bigTile)));
         }
+
         for(int outer = 0; outer < medNumMines; outer ++) { // checking for mine repeats in X dir
             for (int inner = 0; inner < medNumMines; inner ++) {
                 if (xRandom.get(outer) == xRandom.get(inner)) {
@@ -112,11 +125,12 @@ public class Panel extends JPanel implements Runnable {
                     
                 }
             }
+        }
         
         for(int j = 0; j < xIndexMatching.size(); j = j + 2) { // removing repeats
             if(yRandom.get(xIndexMatching.get(j)) == yRandom.get(xIndexMatching.get(j+1))) {
                 for (int i = 0; i < 1; ) {
-                    yRandom.set(xIndexMatching.get(j), (int)Math.random() * 16);
+                    yRandom.set(xIndexMatching.get(j), (int)(Math.random() * (screenLength / bigTile)));
                     if (yRandom.get(xIndexMatching.get(j)) != yRandom.get(xIndexMatching.get(j+1))) {
                         i++;
                     }
@@ -126,6 +140,5 @@ public class Panel extends JPanel implements Runnable {
                 }
             }
         }
-    }
     }
 }
