@@ -3,7 +3,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
-import javax.swing.Timer;
 
 public class Panel extends JPanel implements Runnable{
 
@@ -16,15 +15,17 @@ public class Panel extends JPanel implements Runnable{
     final int fps = 60;
 
 
-    final Color darkSquare = new Color(162, 209, 73);
-    final Color lightSquare = new Color(170, 215, 81);
+    final Color darkGreenSquare = new Color(162, 209, 73);
+    final Color lightGreenSquare = new Color(170, 215, 81);
+    final Color lightBrownSquare = new Color(222, 207, 180);
+    final Color darkBrownSquare = new Color(193, 173, 144);
 
     Thread gameThread; // clk
     MouseHandler mouseHandler = new MouseHandler();
 
     public Panel() {
         this.setPreferredSize(new Dimension(screenWidth, screenLength));
-        this.setBackground(lightSquare);
+        this.setBackground(lightGreenSquare);
         this.setDoubleBuffered(true); // better rendering
         this.addMouseListener(mouseHandler);
         this.setFocusable(true);
@@ -59,7 +60,7 @@ public class Panel extends JPanel implements Runnable{
     }
 
     public void update() {
-        if (mouseHandler.xPosition != 0);
+        
     }
 
     public void paintComponent(Graphics graphics) {
@@ -74,9 +75,20 @@ public class Panel extends JPanel implements Runnable{
                 rowsOffset = 0;
             }
             for (int i = 0; i < screenLength; i = i + (2*bigTile)) {
-                graphics2.setColor(darkSquare);
+                graphics2.setColor(darkGreenSquare);
                 graphics2.fillRect(i + rowsOffset, j, bigTile, bigTile);
             }
+        }
+        if (mouseHandler.xPosition != 0) {
+            int xRemainder = mouseHandler.xPosition % bigTile;
+            int yRemainder = mouseHandler.yPosition % bigTile;
+
+            int xSquareSelect = mouseHandler.xPosition - xRemainder;
+            int ySquareSelect = mouseHandler.yPosition - yRemainder;
+
+            graphics2.setColor(lightBrownSquare);
+            graphics2.fillRect(xSquareSelect, ySquareSelect, bigTile, bigTile);
+
         }
         graphics2.dispose(); // save memory
     }
