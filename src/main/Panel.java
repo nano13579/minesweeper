@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 public class Panel extends JPanel implements Runnable {
 
+    //TODO: Account for mine location at (0, 0) and resulting GAME OVER trigger
+
     final int miniTile = 16;
     final int scale = 3;
     final int bigTile = miniTile * scale;
@@ -166,17 +168,40 @@ public class Panel extends JPanel implements Runnable {
         ArrayList<Integer> yEightCheck = new ArrayList<>();
         ArrayList<Integer> xAdjacentCheck = new ArrayList<>();
         ArrayList<Integer> yAdjacentCheck = new ArrayList<>();
+        ArrayList<Integer> numSurroundingMines = new ArrayList<>();
+        int surroundingIndividual;
+        boolean startCounter = true;
         
-        for (int i = -1; i < 2; i++) {
-            xEightCheck.add((xSquareSelect / bigTile) - i);
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (i == 0 && j == 0) { // not including center square
+                    continue;
+                }
+                else {
+                yEightCheck.add((ySquareSelect / bigTile) - j);
+                xEightCheck.add((xSquareSelect / bigTile) - i);
+                }
+            }
         }
-        for (int j = -1; j < 2; j++) {
-            yEightCheck.add((ySquareSelect / bigTile) - j);
+        System.out.println(xEightCheck);
+        System.out.println(yEightCheck);
+        if (startCounter) { // initial check to identify surrounding mines on first click
+            surroundingIndividual = 0;
+            for (int i = 0; i < xEightCheck.size() - 1; i++) {
+                for (int k = 0; k < xRandom.size() - 1; k++) {
+                    if (xEightCheck.get(i) == xRandom.get(k) && yEightCheck.get(i) == yRandom.get(k)) {
+                        surroundingIndividual++;
+                        System.out.println("surroundingIndividual" + surroundingIndividual);
+                    }
+                    else {
+                        continue;
+                    }
+                }
+            }
+            numSurroundingMines.add(surroundingIndividual);
+            System.out.println("numSurroundingMines" + numSurroundingMines); 
         }
-        
-        for (int k = 0; k < xEightCheck.size() - 1; k++) {
 
-        }   
     }
     
     public void gameStatus() {
