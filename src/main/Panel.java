@@ -52,18 +52,27 @@ public class Panel extends JPanel implements Runnable {
     public void run() {
         double waitTime = (1000000000) / fps;
         double nextPaintTime = System.nanoTime() + waitTime;
+
         if (!minesGenerated) {
             randomMines();
             System.out.println(xRandom);
             System.out.println(yRandom);
             minesGenerated = true;
         }
+        // while (gameThread != null && mouseHandler.mouseUp) {
+
+        //     floodFill();
+
+        // }
         while (gameThread != null && gameOn) { // fps = number of iterations per second
             
             update();
             repaint();
-            floodFill();
+            gameStatus();
 
+            if (mouseHandler.mouseUp) {
+                floodFill();
+            }
 
             try {
                 double timeLeft = nextPaintTime - System.nanoTime();
@@ -87,6 +96,7 @@ public class Panel extends JPanel implements Runnable {
         super.paintComponent(graphics);
         Graphics2D graphics2 = (Graphics2D)graphics;
         int rowsOffset = 0;
+
         for (int j = 0; j < screenWidth; j = j + bigTile) {
             if ((j / bigTile) % 2 == 0) {
                 rowsOffset = bigTile;
@@ -99,6 +109,7 @@ public class Panel extends JPanel implements Runnable {
                 graphics2.fillRect(i + rowsOffset, j, bigTile, bigTile);
             }
         }
+
         if (mouseHandler.xPosition != 0) {
             xRemainder = mouseHandler.xPosition % bigTile;
             yRemainder = mouseHandler.yPosition % bigTile;
@@ -153,15 +164,23 @@ public class Panel extends JPanel implements Runnable {
     public void floodFill() {
         ArrayList<Integer> xEightCheck = new ArrayList<>(); // checking eight surrounding squares for mines
         ArrayList<Integer> yEightCheck = new ArrayList<>();
+        ArrayList<Integer> xAdjacentCheck = new ArrayList<>();
+        ArrayList<Integer> yAdjacentCheck = new ArrayList<>();
+        
         for (int i = -1; i < 2; i++) {
-            xEightCheck.add(xSquareSelect - i);
-            for (int j = -1; j < 2; j++) {
-                yEightCheck.add(ySquareSelect - j);
-            }
+            xEightCheck.add((xSquareSelect / bigTile) - i);
         }
+        for (int j = -1; j < 2; j++) {
+            yEightCheck.add((ySquareSelect / bigTile) - j);
+        }
+        
+        for (int k = 0; k < xEightCheck.size() - 1; k++) {
 
-
-        for (int j = 0; j < xRandom.size() - 1; j++) {
+        }   
+    }
+    
+    public void gameStatus() {
+        for (int j = 0; j < xRandom.size() - 1; j++) { // stop game on mine trigger
             if ((xSquareSelect / bigTile) == xRandom.get(j) && (ySquareSelect / bigTile) == yRandom.get(j)) {                    
                 System.out.println("GAME OVER");
                 gameOn = false;
@@ -169,6 +188,6 @@ public class Panel extends JPanel implements Runnable {
             }
             else {
             }
-        }   
+        }
     }
 }
