@@ -31,6 +31,9 @@ public class Panel extends JPanel implements Runnable {
     private int yRemainder;
     private int xSquareSelect;
     private int ySquareSelect;
+    private int surroundingIndividual;
+    private int xCurrentFloodIndividual;
+    private int yCurrentFloodIndividual;
 
     Thread gameThread; // clk
     MouseHandler mouseHandler = new MouseHandler();
@@ -61,11 +64,7 @@ public class Panel extends JPanel implements Runnable {
             System.out.println(yRandom);
             minesGenerated = true;
         }
-        // while (gameThread != null && mouseHandler.mouseUp) {
 
-        //     floodFill();
-
-        // }
         while (gameThread != null && gameOn) { // fps = number of iterations per second
             
             update();
@@ -123,6 +122,21 @@ public class Panel extends JPanel implements Runnable {
             graphics2.fillRect(xSquareSelect, ySquareSelect, bigTile, bigTile);
 
         }
+
+        for (int i = 0; i < xRandom.size(); i++) { // REMOVE CHEAT LATER!!
+            graphics2.setColor(Color.blue);
+            graphics2.fillRect(xRandom.get(i) * bigTile, yRandom.get(i) * bigTile, bigTile, bigTile);
+        }
+
+        if(surroundingIndividual == 0) {
+            graphics2.setColor(Color.yellow); // yellow = no mines in adjacent 8 squares 
+            graphics.fillRect(xCurrentFloodIndividual * bigTile, yCurrentFloodIndividual * bigTile, bigTile, bigTile); // change this so it isn't square Select
+            floodFill();
+        }
+        else {
+                // display surroundingIndividual in squares with are surrounded by mines
+        }
+
         graphics2.dispose(); // save memory
     }
 
@@ -163,13 +177,13 @@ public class Panel extends JPanel implements Runnable {
         }
     }
 
-    public void floodFill() {
+    public void boundaryCheck(int x, int y) {
+        
         ArrayList<Integer> xEightCheck = new ArrayList<>(); // checking eight surrounding squares for mines
         ArrayList<Integer> yEightCheck = new ArrayList<>();
-        ArrayList<Integer> xAdjacentCheck = new ArrayList<>();
-        ArrayList<Integer> yAdjacentCheck = new ArrayList<>();
+        xCurrentFloodIndividual = x;
+        yCurrentFloodIndividual = y;
         ArrayList<Integer> numSurroundingMines = new ArrayList<>();
-        int surroundingIndividual;
         boolean startCounter = true;
         
         for (int i = -1; i <= 1; i++) {
@@ -178,20 +192,19 @@ public class Panel extends JPanel implements Runnable {
                     continue;
                 }
                 else {
-                yEightCheck.add((ySquareSelect / bigTile) - j);
-                xEightCheck.add((xSquareSelect / bigTile) - i);
+                yEightCheck.add(y - j);
+                xEightCheck.add(x - i);
                 }
             }
         }
-        System.out.println(xEightCheck);
-        System.out.println(yEightCheck);
+        
         if (startCounter) { // initial check to identify surrounding mines on first click
             surroundingIndividual = 0;
-            for (int i = 0; i < xEightCheck.size() - 1; i++) {
-                for (int k = 0; k < xRandom.size() - 1; k++) {
+            for (int i = 0; i < xEightCheck.size(); i++) {
+                for (int k = 0; k < xRandom.size(); k++) {
                     if (xEightCheck.get(i) == xRandom.get(k) && yEightCheck.get(i) == yRandom.get(k)) {
                         surroundingIndividual++;
-                        System.out.println("surroundingIndividual" + surroundingIndividual);
+                        // System.out.println("surroundingIndividual" + surroundingIndividual);
                     }
                     else {
                         continue;
@@ -201,11 +214,26 @@ public class Panel extends JPanel implements Runnable {
             numSurroundingMines.add(surroundingIndividual);
             System.out.println("numSurroundingMines" + numSurroundingMines); 
         }
+    }
+
+    public void floodFill() {
+
+        ArrayList<Integer> xAdjacentCheck = new ArrayList<>();
+        ArrayList<Integer> yAdjacentCheck = new ArrayList<>();
+
+        boundaryCheck(xSquareSelect / bigTile, ySquareSelect / bigTile);
+        
+        if (surroundingIndividual == 0) {
+            for (int i = -1; i < 2; i++) {
+                for (int j = -1; j < 2; j++)
+                boundaryCheck(xSquareSelect / bigTile + i, ySquareSelect / bigTile + j);
+            }
+        }
 
     }
     
     public void gameStatus() {
-        for (int j = 0; j < xRandom.size() - 1; j++) { // stop game on mine trigger
+        for (int j = 0; j < xRandom.size(); j++) { // stop game on mine trigger
             if ((xSquareSelect / bigTile) == xRandom.get(j) && (ySquareSelect / bigTile) == yRandom.get(j)) {                    
                 System.out.println("GAME OVER");
                 gameOn = false;
