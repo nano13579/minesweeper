@@ -17,7 +17,6 @@ public class Panel extends JPanel implements Runnable {
     final int medNumMines = 40;
     final int fps = 60;
 
-
     final Color darkGreenSquare = new Color(162, 209, 73);
     final Color lightGreenSquare = new Color(170, 215, 81);
     final Color lightBrownSquare = new Color(222, 207, 180);
@@ -25,8 +24,12 @@ public class Panel extends JPanel implements Runnable {
 
     ArrayList<Integer> xRandom = new ArrayList<>();
     ArrayList<Integer> yRandom = new ArrayList<>();
+    ArrayList<Integer> numSurroundingMines = new ArrayList<>();
+    ArrayList<Integer> xRevealed = new ArrayList<>();
+    ArrayList<Integer> yRevealed = new ArrayList<>();
 
     public boolean minesGenerated = false;
+    public boolean zeroSurroundingMinesCheck = false;
     private int xRemainder;
     private int yRemainder;
     private int xSquareSelect;
@@ -72,7 +75,8 @@ public class Panel extends JPanel implements Runnable {
             gameStatus();
 
             if (mouseHandler.mouseUp) {
-                floodFill();
+                revealedCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
+                boundaryCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
             }
 
             try {
@@ -97,8 +101,8 @@ public class Panel extends JPanel implements Runnable {
         super.paintComponent(graphics);
         Graphics2D graphics2 = (Graphics2D)graphics;
         int rowsOffset = 0;
-
-        for (int j = 0; j < screenWidth; j = j + bigTile) {
+        //revealCells();
+        for (int j = 0; j < screenWidth; j = j + bigTile) { // basic grid background
             if ((j / bigTile) % 2 == 0) {
                 rowsOffset = bigTile;
             }
@@ -128,15 +132,10 @@ public class Panel extends JPanel implements Runnable {
             graphics2.fillRect(xRandom.get(i) * bigTile, yRandom.get(i) * bigTile, bigTile, bigTile);
         }
 
-        if(surroundingIndividual == 0) {
+        if (zeroSurroundingMinesCheck) { // if no adjacent mines use revealCells for flood fill
             graphics2.setColor(Color.yellow); // yellow = no mines in adjacent 8 squares 
-            graphics.fillRect(xCurrentFloodIndividual * bigTile, yCurrentFloodIndividual * bigTile, bigTile, bigTile); // change this so it isn't square Select
-            floodFill();
+            graphics.fillRect(xCurrentFloodIndividual * bigTile, yCurrentFloodIndividual * bigTile, bigTile, bigTile);
         }
-        else {
-                // display surroundingIndividual in squares with are surrounded by mines
-        }
-
         graphics2.dispose(); // save memory
     }
 
@@ -176,7 +175,7 @@ public class Panel extends JPanel implements Runnable {
             }
         }
     }
-
+    
     public void boundaryCheck(int x, int y) {
         
         ArrayList<Integer> xEightCheck = new ArrayList<>(); // checking eight surrounding squares for mines
@@ -212,24 +211,48 @@ public class Panel extends JPanel implements Runnable {
                 }
             }
             numSurroundingMines.add(surroundingIndividual);
-            System.out.println("numSurroundingMines" + numSurroundingMines); 
+                for (int i = 0; i < numSurroundingMines.size(); i++) {
+                    if (numSurroundingMines.get(i) != 0) {
+                        zeroSurroundingMinesCheck = false;
+                        break;
+                    }
+                    zeroSurroundingMinesCheck = true; // this is pretty much a duplicate of surroundingIndividual and
+            }                                           // can be deleted at a later date
         }
     }
 
-    public void floodFill() {
-
-        ArrayList<Integer> xAdjacentCheck = new ArrayList<>();
-        ArrayList<Integer> yAdjacentCheck = new ArrayList<>();
-
-        boundaryCheck(xSquareSelect / bigTile, ySquareSelect / bigTile);
-        
-        if (surroundingIndividual == 0) {
-            for (int i = -1; i < 2; i++) {
-                for (int j = -1; j < 2; j++)
-                boundaryCheck(xSquareSelect / bigTile + i, ySquareSelect / bigTile + j);
+    public void revealCells(int x, int y) {
+        boolean isRevealed = false;
+        boolean isMined = false;
+        for (int i = 0; i < xRevealed.size(); i++) {
+            if (x == xRevealed.get(i)) {
+                for (int j = 0; j < yRevealed.size(); j++) {
+                    if (y == yRevealed.get(j)) {
+                        isRevealed = true;
+                    }
+                }
             }
         }
+        for (int i = 0; i < xRandom.size(); i++) {
+            if (x == xRandom.get(i)) {
+                for (int j = 0; j < yRandom.size(); j++) {
+                    if (y == yRandom.get(j)) {
+                        isMined = true;
+                    }
+                }
+            }
+        }
+        if (x < 0 || x > (screenWidth / 16) || y < 0 || y > (screenLength / 16)) {
+            return;
+        }
+        if (isRevealed || isMined) {
+            return;
+        }
+    }
 
+    public void revealedCheck(int xSelected, int ySelected) {
+        xRevealed.add(xSelected);
+        yRevealed.add(ySelected);
     }
     
     public void gameStatus() {
