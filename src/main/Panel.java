@@ -136,6 +136,88 @@ public class Panel extends JPanel implements Runnable {
             graphics2.setColor(Color.yellow); // yellow = no mines in adjacent 8 squares 
             graphics.fillRect(xCurrentFloodIndividual * bigTile, yCurrentFloodIndividual * bigTile, bigTile, bigTile);
         }
+
+        if (mouseHandler.mouseUp) {
+            for(int i = 0; i < 16; i++) {
+                for(int j = 0; j < 16; j++) {
+                    boolean mineLocated = false;
+                    boolean mineAdjacent = false;
+                    int xAdjacentLocation = 100;  // big random number
+                    int yAdjacentLocation = 100;
+                    for (int k = 0; k < xRandom.size(); k++) {
+                        if(xRandom.get(k) == i && yRandom.get(k) == j) {
+                            mineLocated = true;
+                            break;
+                        }
+                        else if(surroundingIndividual > 0){
+                            mineAdjacent = true;
+                        //     //mineLocated = true;
+                        //     xAdjacentLocation = i - 1;
+                        //     yAdjacentLocation = j;
+                        //     break;
+                        // }
+                        // else if(xRandom.get(k) == i && yRandom.get(k) + 1 == j){
+                        //     mineAdjacent = true;
+                        //     //mineLocated = true;
+                        //     xAdjacentLocation = i;
+                        //     yAdjacentLocation = j - 1;
+                        //     break;
+                        // }
+                        // else if(xRandom.get(k) + 1 == i && yRandom.get(k) + 1== j){
+                        //     mineAdjacent = true;
+                        //     //mineLocated = true;
+                        //     xAdjacentLocation = i - 1;
+                        //     yAdjacentLocation = j - 1;
+                        //     break;
+                        // }
+                        // else if(xRandom.get(k) -1 == i && yRandom.get(k) == j){
+                        //     mineAdjacent = true;
+                        //     //mineLocated = true;
+                        //     xAdjacentLocation = i + 1;
+                        //     yAdjacentLocation = j;
+                        //     break;
+                        // }
+                        // else if(xRandom.get(k) == i && yRandom.get(k) - 1 == j){
+                        //     mineAdjacent = true;
+                        //     //mineLocated = true;
+                        //     xAdjacentLocation = i;
+                        //     yAdjacentLocation = j + 1;
+                        //     break;
+                        // }
+                        // else if(xRandom.get(k) -1 == i && yRandom.get(k) -1 == j){
+                        //     mineAdjacent = true;
+                        //     //mineLocated = true;
+                        //     xAdjacentLocation = i + 1;
+                        //     yAdjacentLocation = j + 1;
+                        //     break;
+                        // }
+                        // else if(xRandom.get(k) -1 == i && yRandom.get(k) +1 == j){
+                        //     mineAdjacent = true;
+                        //     //mineLocated = true;
+                        //     xAdjacentLocation = i + 1;
+                        //     yAdjacentLocation = j - 1;
+                        //     break;
+                        // }
+                        // else if(xRandom.get(k) +1 == i && yRandom.get(k) -1 == j){
+                        //     mineAdjacent = true;
+                        //     //mineLocated = true;
+                        //     xAdjacentLocation = i - 1;
+                        //     yAdjacentLocation = j + 1;
+                        //     break;
+                        // }
+                        }
+                    }
+                    if (!mineLocated) {
+                        graphics.setColor(Color.orange);
+                        graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
+                    }
+                    else if (!mineAdjacent) {
+                        graphics.setColor(Color.red);
+                        graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
+                    }
+                }
+            }
+        }
         graphics2.dispose(); // save memory
     }
 
