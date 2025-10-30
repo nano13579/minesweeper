@@ -153,34 +153,34 @@ public class Panel extends JPanel implements Runnable {
                             mineAdjacent = true;
                         }
                     }
-                    // if (mineAdjacent) {
-                    //         graphics.setColor(Color.red);
-                    //         graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
-                    // }
-                    // if (!mineLocated) {
-                    //     graphics.setColor(Color.orange);
-                    //     graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
-                    // }
-                    // else if (!mineLocated) {
-                    //     graphics.setColor(Color.red);
-                    //     graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
-                    // }
                     if (mineLocated) {
-                // show mine only on game over; while playing keep it hidden if desired
-                        if (!gameOn) {
-                            graphics.setColor(Color.red); // visible mine color
-                            graphics.fillRect(i*bigTile, j*bigTile, bigTile, bigTile);
-                        } 
-                        else {
-                        }
                     } 
                     else if (mineAdjacent) {
-                        graphics.setColor(Color.red);     // adjacent-to-mine color
+                        graphics.setColor(Color.red);
                         graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
                     } else {
-                        graphics.setColor(Color.orange);  // safe / non-adjacent color
+                        graphics.setColor(Color.orange);
                         graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
                     }
+                }
+            }
+            int xSelectPoint = xSquareSelect / bigTile;
+            int ySelectPoint = ySquareSelect / bigTile;
+            boundaryCheck(xSelectPoint, ySelectPoint);
+            graphics.setColor(Color.green);
+            for (int i = xSelectPoint; i < (screenLength / bigTile); i++) {
+                for (int j = 0; j < xRandom.size();) {
+                    if (xSelectPoint + i == xRandom.get(j)) {
+                        if (ySelectPoint == yRandom.get(j)) {
+                            j++;
+                        }
+                    }
+                    else {
+                        // System.out.println("x coordinate" + (xSelectPoint + i));
+                        // System.out.println("y coordinate" + ySquareSelect);
+                        break;
+                    }
+                    graphics.fillRect((screenLength - (xSelectPoint + i)*bigTile), ySelectPoint*bigTile, bigTile, bigTile);
                 }
             }
         }
@@ -251,7 +251,7 @@ public class Panel extends JPanel implements Runnable {
                 for (int k = 0; k < xRandom.size(); k++) {
                     if (xEightCheck.get(i) == xRandom.get(k) && yEightCheck.get(i) == yRandom.get(k)) {
                         surroundingIndividual++;
-                        System.out.println("surroundingIndividual" + surroundingIndividual);
+                        //System.out.println("surroundingIndividual" + surroundingIndividual);
                     }
                     else {
                         continue;
@@ -301,6 +301,10 @@ public class Panel extends JPanel implements Runnable {
     public void revealedCheck(int xSelected, int ySelected) {
         xRevealed.add(xSelected);
         yRevealed.add(ySelected);
+    }
+
+    private void floodFill(int x, int y) {
+
     }
     
     public void gameStatus() {
