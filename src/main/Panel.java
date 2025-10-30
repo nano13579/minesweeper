@@ -153,18 +153,34 @@ public class Panel extends JPanel implements Runnable {
                             mineAdjacent = true;
                         }
                     }
-                    if (!mineLocated) {
-                        graphics.setColor(Color.orange);
-                        graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
-                    }
-                    if (mineAdjacent) {
-                            graphics.setColor(Color.red);
-                            graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
-                    }
+                    // if (mineAdjacent) {
+                    //         graphics.setColor(Color.red);
+                    //         graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
+                    // }
+                    // if (!mineLocated) {
+                    //     graphics.setColor(Color.orange);
+                    //     graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
+                    // }
                     // else if (!mineLocated) {
                     //     graphics.setColor(Color.red);
                     //     graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
                     // }
+                    if (mineLocated) {
+                // show mine only on game over; while playing keep it hidden if desired
+                        if (!gameOn) {
+                            graphics.setColor(Color.red); // visible mine color
+                            graphics.fillRect(i*bigTile, j*bigTile, bigTile, bigTile);
+                        } 
+                        else {
+                        }
+                    } 
+                    else if (mineAdjacent) {
+                        graphics.setColor(Color.red);     // adjacent-to-mine color
+                        graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
+                    } else {
+                        graphics.setColor(Color.orange);  // safe / non-adjacent color
+                        graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
+                    }
                 }
             }
         }
