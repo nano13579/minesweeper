@@ -76,7 +76,7 @@ public class Panel extends JPanel implements Runnable {
 
             if (mouseHandler.mouseUp) {
                 revealedCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
-                boundaryCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
+                //boundaryCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
             }
 
             try {
@@ -142,79 +142,29 @@ public class Panel extends JPanel implements Runnable {
                 for(int j = 0; j < 16; j++) {
                     boolean mineLocated = false;
                     boolean mineAdjacent = false;
-                    int xAdjacentLocation = 100;  // big random number
-                    int yAdjacentLocation = 100;
                     for (int k = 0; k < xRandom.size(); k++) {
-                        if(xRandom.get(k) == i && yRandom.get(k) == j) {
+                        int x = Math.abs(xRandom.get(k) - i);
+                        int y = Math.abs(yRandom.get(k) - j);
+                        if (x == 0 && y == 0) {
                             mineLocated = true;
                             break;
                         }
-                        else if(surroundingIndividual > 0){
+                        else if (x <= 1 && y <= 1) {
                             mineAdjacent = true;
-                        //     //mineLocated = true;
-                        //     xAdjacentLocation = i - 1;
-                        //     yAdjacentLocation = j;
-                        //     break;
-                        // }
-                        // else if(xRandom.get(k) == i && yRandom.get(k) + 1 == j){
-                        //     mineAdjacent = true;
-                        //     //mineLocated = true;
-                        //     xAdjacentLocation = i;
-                        //     yAdjacentLocation = j - 1;
-                        //     break;
-                        // }
-                        // else if(xRandom.get(k) + 1 == i && yRandom.get(k) + 1== j){
-                        //     mineAdjacent = true;
-                        //     //mineLocated = true;
-                        //     xAdjacentLocation = i - 1;
-                        //     yAdjacentLocation = j - 1;
-                        //     break;
-                        // }
-                        // else if(xRandom.get(k) -1 == i && yRandom.get(k) == j){
-                        //     mineAdjacent = true;
-                        //     //mineLocated = true;
-                        //     xAdjacentLocation = i + 1;
-                        //     yAdjacentLocation = j;
-                        //     break;
-                        // }
-                        // else if(xRandom.get(k) == i && yRandom.get(k) - 1 == j){
-                        //     mineAdjacent = true;
-                        //     //mineLocated = true;
-                        //     xAdjacentLocation = i;
-                        //     yAdjacentLocation = j + 1;
-                        //     break;
-                        // }
-                        // else if(xRandom.get(k) -1 == i && yRandom.get(k) -1 == j){
-                        //     mineAdjacent = true;
-                        //     //mineLocated = true;
-                        //     xAdjacentLocation = i + 1;
-                        //     yAdjacentLocation = j + 1;
-                        //     break;
-                        // }
-                        // else if(xRandom.get(k) -1 == i && yRandom.get(k) +1 == j){
-                        //     mineAdjacent = true;
-                        //     //mineLocated = true;
-                        //     xAdjacentLocation = i + 1;
-                        //     yAdjacentLocation = j - 1;
-                        //     break;
-                        // }
-                        // else if(xRandom.get(k) +1 == i && yRandom.get(k) -1 == j){
-                        //     mineAdjacent = true;
-                        //     //mineLocated = true;
-                        //     xAdjacentLocation = i - 1;
-                        //     yAdjacentLocation = j + 1;
-                        //     break;
-                        // }
                         }
                     }
                     if (!mineLocated) {
                         graphics.setColor(Color.orange);
                         graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
                     }
-                    else if (!mineAdjacent) {
-                        graphics.setColor(Color.red);
-                        graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
+                    if (mineAdjacent) {
+                            graphics.setColor(Color.red);
+                            graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
                     }
+                    // else if (!mineLocated) {
+                    //     graphics.setColor(Color.red);
+                    //     graphics.fillRect(i * bigTile, j * bigTile, bigTile, bigTile);
+                    // }
                 }
             }
         }
@@ -285,7 +235,7 @@ public class Panel extends JPanel implements Runnable {
                 for (int k = 0; k < xRandom.size(); k++) {
                     if (xEightCheck.get(i) == xRandom.get(k) && yEightCheck.get(i) == yRandom.get(k)) {
                         surroundingIndividual++;
-                        // System.out.println("surroundingIndividual" + surroundingIndividual);
+                        System.out.println("surroundingIndividual" + surroundingIndividual);
                     }
                     else {
                         continue;
