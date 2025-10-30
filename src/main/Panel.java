@@ -74,12 +74,13 @@ public class Panel extends JPanel implements Runnable {
         while (gameThread != null && gameOn) { // fps = number of iterations per second
             
             update();
-            gameStatus();
             repaint();
+            gameStatus();
 
             if (mouseHandler.mouseUp) {
                 revealedCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
                 boundaryCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
+                repaint();
             }
 
             try {
@@ -167,6 +168,12 @@ public class Panel extends JPanel implements Runnable {
                     }
                 }
             }
+            for (int i = 0; i < xFloodFill.size(); i++) {
+            graphics.setColor(Color.green);
+            graphics.fillRect(xFloodFill.get(i) * bigTile, yFloodFill.get(i) * bigTile, bigTile, bigTile);
+            System.out.println(xFloodFill);
+            System.out.println(yFloodFill);
+        }
         }
         graphics2.dispose(); // save memory
     }
