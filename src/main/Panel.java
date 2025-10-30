@@ -80,6 +80,7 @@ public class Panel extends JPanel implements Runnable {
             if (mouseHandler.mouseUp) {
                 revealedCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
                 boundaryCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
+                floodFill((xSquareSelect / bigTile), (ySquareSelect / bigTile));
                 repaint();
             }
 
@@ -119,18 +120,6 @@ public class Panel extends JPanel implements Runnable {
             }
         }
 
-        if (mouseHandler.xPosition != 0) {
-            xRemainder = mouseHandler.xPosition % bigTile;
-            yRemainder = mouseHandler.yPosition % bigTile;
-
-            xSquareSelect = mouseHandler.xPosition - xRemainder;
-            ySquareSelect = mouseHandler.yPosition - yRemainder;
-
-            graphics2.setColor(lightBrownSquare);
-            graphics2.fillRect(xSquareSelect, ySquareSelect, bigTile, bigTile);
-
-        }
-
         for (int i = 0; i < xRandom.size(); i++) { // REMOVE CHEAT LATER!!
             graphics2.setColor(Color.blue);
             graphics2.fillRect(xRandom.get(i) * bigTile, yRandom.get(i) * bigTile, bigTile, bigTile);
@@ -140,7 +129,7 @@ public class Panel extends JPanel implements Runnable {
             graphics2.setColor(Color.yellow); // yellow = no mines in adjacent 8 squares 
             graphics.fillRect(xCurrentFloodIndividual * bigTile, yCurrentFloodIndividual * bigTile, bigTile, bigTile);
         }
-
+        ArrayList<Boolean> mineAdjacentList = new ArrayList<>();
         if (mouseHandler.mouseUp) {
             for(int i = 0; i < 16; i++) {
                 for(int j = 0; j < 16; j++) {
@@ -155,6 +144,7 @@ public class Panel extends JPanel implements Runnable {
                         }
                         else if (x <= 1 && y <= 1) {
                             mineAdjacent = true;
+                            mineAdjacentList.add(mineAdjacent);
                         }
                     }
                     if (mineLocated) {
@@ -168,12 +158,26 @@ public class Panel extends JPanel implements Runnable {
                     }
                 }
             }
-            for (int i = 0; i < xFloodFill.size(); i++) {
+
+            if (mouseHandler.xPosition != 0) {
+            xRemainder = mouseHandler.xPosition % bigTile;
+            yRemainder = mouseHandler.yPosition % bigTile;
+
+            xSquareSelect = mouseHandler.xPosition - xRemainder;
+            ySquareSelect = mouseHandler.yPosition - yRemainder;
+
+            graphics2.setColor(Color.green);
+            graphics2.fillRect(xSquareSelect, ySquareSelect, bigTile, bigTile);
+            }
+
+            ArrayList<Integer> xDraw = new ArrayList<>(xFloodFill);
+            ArrayList<Integer> yDraw = new ArrayList<>(yFloodFill);
             graphics.setColor(Color.green);
-            graphics.fillRect(xFloodFill.get(i) * bigTile, yFloodFill.get(i) * bigTile, bigTile, bigTile);
-            System.out.println(xFloodFill);
-            System.out.println(yFloodFill);
-        }
+            for (int i = 0; i < xDraw.size(); i++) {
+                if (xDraw.get(i) != null && yDraw.get(i) != null){
+                    graphics.fillRect(xDraw.get(i) * bigTile, yDraw.get(i) * bigTile, bigTile, bigTile);
+                }
+            }
         }
         graphics2.dispose(); // save memory
     }
@@ -223,9 +227,7 @@ public class Panel extends JPanel implements Runnable {
         yCurrentFloodIndividual = y;
         ArrayList<Integer> numSurroundingMines = new ArrayList<>();
         boolean startCounter = true;
-        ArrayList<Integer> xFloodFill = new ArrayList<>();
-        ArrayList<Integer> yFloodFill = new ArrayList<>();
-        
+
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 if (i == 0 && j == 0) { // not including center square
@@ -261,25 +263,24 @@ public class Panel extends JPanel implements Runnable {
             }
             // int xSelectPoint = xSquareSelect / bigTile;
             // int ySelectPoint = ySquareSelect / bigTile;
-            for (int i = 1; i < (screenLength / bigTile) - x; i++) {
-                boolean mineHere = false;
-                for (int j = 0; j < xRandom.size();) {
-                    if (x + i == xRandom.get(j) && y == yRandom.get(j)) {
-                        mineHere = true;
-                        break;
-                    }
-                    else {
-                        xFloodFill.add(x+i);
-                        yFloodFill.add(y);
-                    }
+            // for (int i = 1; i < (screenLength / bigTile) - x; i++) {
+            //     boolean mineHere = false;
+            //     for (int j = 0; j < xRandom.size();) {
+            //         if (x + i == xRandom.get(j) && y == yRandom.get(j)) {
+            //             mineHere = true;
+            //             break;
+            //         }
+            //         else {
+            //             xFloodFill.add(x+i);
+            //             yFloodFill.add(y);
+            //         }
 
-                }
-                if (mineHere) {
-                    System.out.println("Stopped bc there is a mine!");
-                    break;
-                }
+            //     }
+            //     if (mineHere) {
+            //         System.out.println("Stopped bc there is a mine!");
+            //         break;
+            //     }
                 
-            }
         }
     }
 
@@ -318,7 +319,30 @@ public class Panel extends JPanel implements Runnable {
     }
 
     private void floodFill(int x, int y) {
-
+        // int xSelectPoint = xSquareSelect / bigTile;
+        // int ySelectPoint = ySquareSelect / bigTile;
+        xFloodFill.clear();
+        yFloodFill.clear();
+        for (int i = 1; i < (screenLength / bigTile) - x; i++) {
+            boolean mineHere = false;
+            for (int j = 0; j < xRandom.size(); j++) {
+                if (x + i == xRandom.get(j) && y == yRandom.get(j)) {
+                    mineHere = true;
+                    break;
+                }
+            }
+            if (mineHere) {
+                break;
+            }
+            else {
+                xFloodFill.add(x+i);
+                yFloodFill.add(y);
+            }
+            // graphics.setColor(Color.green);
+            // for(int k = 0; i < xFloodFill.size(); k++) {
+            //     graphics.fillRect(xFloodFill.get(k)*bigTile, yFloodFill.get(k) * bigTile, bigTile, bigTile);
+            // }
+        }
     }
     
     public void gameStatus() {
