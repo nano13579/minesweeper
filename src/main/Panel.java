@@ -38,6 +38,9 @@ public class Panel extends JPanel implements Runnable {
     private int xCurrentFloodIndividual;
     private int yCurrentFloodIndividual;
 
+    ArrayList<Integer> xFloodFill = new ArrayList<>();
+    ArrayList<Integer> yFloodFill = new ArrayList<>();
+
     Thread gameThread; // clk
     MouseHandler mouseHandler = new MouseHandler();
 
@@ -71,12 +74,12 @@ public class Panel extends JPanel implements Runnable {
         while (gameThread != null && gameOn) { // fps = number of iterations per second
             
             update();
-            repaint();
             gameStatus();
+            repaint();
 
             if (mouseHandler.mouseUp) {
                 revealedCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
-                //boundaryCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
+                boundaryCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
             }
 
             try {
@@ -164,25 +167,6 @@ public class Panel extends JPanel implements Runnable {
                     }
                 }
             }
-            int xSelectPoint = xSquareSelect / bigTile;
-            int ySelectPoint = ySquareSelect / bigTile;
-            boundaryCheck(xSelectPoint, ySelectPoint);
-            graphics.setColor(Color.green);
-            for (int i = xSelectPoint; i < (screenLength / bigTile); i++) {
-                for (int j = 0; j < xRandom.size();) {
-                    if (xSelectPoint + i == xRandom.get(j)) {
-                        if (ySelectPoint == yRandom.get(j)) {
-                            j++;
-                        }
-                    }
-                    else {
-                        // System.out.println("x coordinate" + (xSelectPoint + i));
-                        // System.out.println("y coordinate" + ySquareSelect);
-                        break;
-                    }
-                    graphics.fillRect((screenLength - (xSelectPoint + i)*bigTile), ySelectPoint*bigTile, bigTile, bigTile);
-                }
-            }
         }
         graphics2.dispose(); // save memory
     }
@@ -232,6 +216,8 @@ public class Panel extends JPanel implements Runnable {
         yCurrentFloodIndividual = y;
         ArrayList<Integer> numSurroundingMines = new ArrayList<>();
         boolean startCounter = true;
+        ArrayList<Integer> xFloodFill = new ArrayList<>();
+        ArrayList<Integer> yFloodFill = new ArrayList<>();
         
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
@@ -265,7 +251,28 @@ public class Panel extends JPanel implements Runnable {
                         break;
                     }
                     zeroSurroundingMinesCheck = true; // this is pretty much a duplicate of surroundingIndividual and
-            }                                           // can be deleted at a later date
+            }
+            // int xSelectPoint = xSquareSelect / bigTile;
+            // int ySelectPoint = ySquareSelect / bigTile;
+            for (int i = 1; i < (screenLength / bigTile) - x; i++) {
+                boolean mineHere = false;
+                for (int j = 0; j < xRandom.size();) {
+                    if (x + i == xRandom.get(j) && y == yRandom.get(j)) {
+                        mineHere = true;
+                        break;
+                    }
+                    else {
+                        xFloodFill.add(x+i);
+                        yFloodFill.add(y);
+                    }
+
+                }
+                if (mineHere) {
+                    System.out.println("Stopped bc there is a mine!");
+                    break;
+                }
+                
+            }
         }
     }
 
