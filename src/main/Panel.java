@@ -7,8 +7,6 @@ import java.util.ArrayList;
 
 public class Panel extends JPanel implements Runnable {
 
-    //TODO: Account for mine location at (0, 0) and resulting GAME OVER trigger
-
     final int miniTile = 16;
     final int scale = 3;
     final int bigTile = miniTile * scale;
@@ -38,6 +36,9 @@ public class Panel extends JPanel implements Runnable {
     private int xCurrentFloodIndividual;
     private int yCurrentFloodIndividual;
 
+    ArrayList<Boolean> mineAdjacentBoolean = new ArrayList<>();
+    ArrayList<Integer> xMineAdjacentSquares = new ArrayList<>();
+    ArrayList<Integer> yMineAdjacentSquares = new ArrayList<>();
     ArrayList<Integer> xFloodFill = new ArrayList<>();
     ArrayList<Integer> yFloodFill = new ArrayList<>();
 
@@ -130,7 +131,7 @@ public class Panel extends JPanel implements Runnable {
             graphics.fillRect(xCurrentFloodIndividual * bigTile, yCurrentFloodIndividual * bigTile, bigTile, bigTile);
         }
 
-        ArrayList<Boolean> mineAdjacentList = new ArrayList<>();
+        mineAdjacentBoolean.clear();
         ArrayList<Integer> xDraw = new ArrayList<>(xFloodFill);
         ArrayList<Integer> yDraw = new ArrayList<>(yFloodFill);
         if (mouseHandler.mouseUp) {
@@ -147,7 +148,9 @@ public class Panel extends JPanel implements Runnable {
                         }
                         else if (x <= 1 && y <= 1) {
                             mineAdjacent = true;
-                            mineAdjacentList.add(mineAdjacent);
+                            mineAdjacentBoolean.add(mineAdjacent);
+                            xMineAdjacentSquares.add(xRandom.get(k) - i);
+                            yMineAdjacentSquares.add(yRandom.get(k) - j);
                         }
                     }
                     if (mineLocated) {
@@ -188,9 +191,12 @@ public class Panel extends JPanel implements Runnable {
         yRandom.clear();
         ArrayList<Integer> xIndexMatching = new ArrayList<>();
 
-        for(int i = 0; i < medNumMines; i ++) {
+        for(int i = 0; i < medNumMines; i++) {
             xRandom.add((int)(Math.random() * (screenWidth / bigTile)));
             yRandom.add((int)(Math.random() * (screenLength / bigTile)));
+            if (xRandom.get(i) == 0 && yRandom.get(i) == 0) {
+                xRandom.set(i, ((int)(Math.random() * (screenWidth / bigTile)) + 1));
+            }
         }
 
         for(int outer = 0; outer < medNumMines; outer ++) { // checking for mine repeats in X dir
@@ -304,51 +310,35 @@ public class Panel extends JPanel implements Runnable {
         xFloodFill.clear();
         yFloodFill.clear();
         
-        for (int k = 0; k < (screenWidth / bigTile) - y; k++) {
-            for (int i = 0; i < (screenLength / bigTile) - x; i++) {
-                boolean mineHere = false;
-                for (int j = 0; j < xRandom.size(); j++) {
-                    if (x + i == xRandom.get(j) && y+k == yRandom.get(j)) {
-                        mineHere = true;
-                        break;
-                    }
-                }
-                if (mineHere) {
-                    break;
-                }
-                boundaryCheck(x+i, y+k);
-                if (surroundingIndividual == 0){
-                    xFloodFill.add(x+i);
-                    yFloodFill.add(y+k);
-                }
-                else {
-                    break;
-                }
-            }
-            for (int i = 1; i <=  x; i++) {
-                boolean mineHere = false;
-                if (x - i < 0) {
-                    break;
-                }
+        boolean breakTime = false;
+        
+        while (!breakTime) {
+            for (int k = 0; k < (screenWidth / bigTile) - y; k++) {
+                for (int i = 0; i < (screenLength / bigTile) - x; i++) {
+                    boolean mineHere = false;
                     for (int j = 0; j < xRandom.size(); j++) {
-                        if (x - i == xRandom.get(j) && y+k == yRandom.get(j)) {
+                        if (x + i == xRandom.get(j) && y+k == yRandom.get(j)) {
                             mineHere = true;
+                            breakTime = true;
                             break;
                         }
                     }
                     if (mineHere) {
+                        breakTime = true;
                         break;
                     }
-                    boundaryCheck(x-i, y+k);
+                    boundaryCheck(x+i, y+k);
                     if (surroundingIndividual == 0){
-                        xFloodFill.add(x-i);
+                        xFloodFill.add(x+i);
                         yFloodFill.add(y+k);
                     }
                     else {
+                        breakTime = true;
                         break;
                     }
                 }
             }
+        }
     }
     
     public void gameStatus() {
