@@ -81,6 +81,8 @@ public class Panel extends JPanel implements Runnable {
             if (mouseHandler.mouseUp) {
                 revealedCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
                 boundaryCheck((xSquareSelect / bigTile), (ySquareSelect / bigTile));
+                xFloodFill.add(xSquareSelect / bigTile);
+                yFloodFill.add(ySquareSelect / bigTile);
                 floodFill((xSquareSelect / bigTile), (ySquareSelect / bigTile));
                 repaint();
             }
@@ -159,8 +161,8 @@ public class Panel extends JPanel implements Runnable {
                         graphics.setColor(Color.red);
                         graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
                     } else {
-                        graphics.setColor(Color.orange);
-                        graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
+                        // graphics.setColor(Color.orange);
+                        // graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
                     }
                 }
             }
@@ -176,7 +178,7 @@ public class Panel extends JPanel implements Runnable {
             graphics2.fillRect(xSquareSelect, ySquareSelect, bigTile, bigTile);
             }
 
-            graphics.setColor(Color.green);
+            graphics.setColor(Color.orange);
             for (int i = 0; i < xDraw.size(); i++) {
                 if (xDraw.get(i) != null && yDraw.get(i) != null){
                     graphics.fillRect(xDraw.get(i) * bigTile, yDraw.get(i) * bigTile, bigTile, bigTile);
@@ -306,83 +308,60 @@ public class Panel extends JPanel implements Runnable {
         yRevealed.add(ySelected);
     }
 
-    private void floodFill(int x, int y) {
-        // xFloodFill.clear();
-        // yFloodFill.clear();
+    private void floodFill(int x, int y) { // TODO actually start at (x, y) :heavy-sob:
+        System.out.println("flood fill invoked");
+        System.out.println("start sizes x=" + xFloodFill.size() + " y=" + yFloodFill.size());
+        
+        try {
         int index = 0;
-        while (index < xFloodFill.size()) {
-            int xNew = xFloodFill.get(index);
-            int yNew = yFloodFill.get(index);
-            index++;
-            boolean isMined = false;
-            for (int i = 0; i < xRandom.size(); i++) {
-                if (xNew == xRandom.get(i) && yNew == yRandom.get(i)) {
-                    isMined = true;
-                    break;
-                }
-            }
-            if (isMined) {
-                continue;
-            }
-            boundaryCheck(xNew, yNew);
+            while (index < xFloodFill.size()) { // problem: xFloodFill 
+                int xNew = xFloodFill.get(index);
+                int yNew = yFloodFill.get(index);
+                index++;
 
-            if (surroundingIndividual == 0) {
-                for (int j = -1; j <= 1; j++) {
-                    for (int k = -1; k <= 1; k++) {
-                        if (j == 0 && k == 0) {
-                            continue;
-                        }
-                        int xDoubleNew = xNew + j;
-                        int yDoubleNew = yNew + k;
-                        if (xDoubleNew < 0 || yDoubleNew < 0 || xDoubleNew >= (screenLength / bigTile) || yDoubleNew >= (screenWidth / bigTile)) {
-                            continue;
-                        }
-                        boolean innerMined = false;
-                        for (int l = 0; l < xRandom.size(); l++) {
-                            if (xDoubleNew == xRandom.get(l) && yDoubleNew == yRandom.get(l)) {
-                                innerMined = true;
+                boolean mineHere = false;
+                for (int i = 0; i < xRandom.size(); i++) {
+                    if (xNew == xRandom.get(i) && yNew == yRandom.get(i)) {
+                        mineHere = true;
+                        break;
+                    }
+                }
+                if (mineHere) continue;
+
+                boundaryCheck(xNew, yNew);
+                if (surroundingIndividual != 0) {
+                    continue;
+                }       
+
+                for (int dx = -1; dx <= 1; dx++) {
+                    for (int dy = -1; dy <= 1; dy++) {
+                        if (dx == 0 && dy == 0) continue;
+
+                        int nx = xNew + dx;
+                        int ny = yNew + dy;
+
+                        if (nx < 0 || ny < 0 || nx >= (screenLength / bigTile) || ny >= (screenWidth / bigTile)) continue;
+
+                        boolean neighborMined = false;
+                        for (int m = 0; m < xRandom.size(); m++) {
+                            if (nx == xRandom.get(m) && ny == yRandom.get(m)) {
+                                neighborMined = true;
                                 break;
                             }
                         }
-                        if (innerMined) {
-                            continue;
-                        }
-                    xFloodFill.add(xDoubleNew);
-                    yFloodFill.add(yDoubleNew);
+                        if (neighborMined) continue;
+
+                        xFloodFill.add(nx);
+                        yFloodFill.add(ny);
                     }
                 }
             }
-            else {
-                continue;
-            }
-        }
-
-        // while (!breakTime) {
-        //     for (int k = 0; k < (screenWidth / bigTile) - y; k++) {
-        //         for (int i = 0; i < (screenLength / bigTile) - x; i++) {
-        //             boolean mineHere = false;
-        //             for (int j = 0; j < xRandom.size(); j++) {
-        //                 if (x + i == xRandom.get(j) && y+k == yRandom.get(j)) {
-        //                     mineHere = true;
-        //                     breakTime = true;
-        //                     break;
-        //                 }
-        //             }
-        //             if (mineHere) {
-        //                 breakTime = true;
-        //                 break;
-        //             }
-        //             boundaryCheck(x+i, y+k);
-        //             if (surroundingIndividual == 0){
-        //                 xFloodFill.add(x+i);
-        //                 yFloodFill.add(y+k);
-        //             }
-        //             else {
-        //                 breakTime = true;
-        //                 break;
-        //             }
-        //         }
-        //     }
+    } catch (Exception e) {
+    System.out.println("Exception in flood fill: " + e);
+    e.printStackTrace();
+    }
+    System.out.println("xflood fill" + xFloodFill);
+    System.out.println("yFlood fill" + yFloodFill);
     }
     
     public void gameStatus() {
