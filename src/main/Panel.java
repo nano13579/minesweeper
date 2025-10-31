@@ -307,38 +307,82 @@ public class Panel extends JPanel implements Runnable {
     }
 
     private void floodFill(int x, int y) {
-        xFloodFill.clear();
-        yFloodFill.clear();
-        
-        boolean breakTime = false;
-        
-        while (!breakTime) {
-            for (int k = 0; k < (screenWidth / bigTile) - y; k++) {
-                for (int i = 0; i < (screenLength / bigTile) - x; i++) {
-                    boolean mineHere = false;
-                    for (int j = 0; j < xRandom.size(); j++) {
-                        if (x + i == xRandom.get(j) && y+k == yRandom.get(j)) {
-                            mineHere = true;
-                            breakTime = true;
-                            break;
+        // xFloodFill.clear();
+        // yFloodFill.clear();
+        int index = 0;
+        while (index < xFloodFill.size()) {
+            int xNew = xFloodFill.get(index);
+            int yNew = yFloodFill.get(index);
+            index++;
+            boolean isMined = false;
+            for (int i = 0; i < xRandom.size(); i++) {
+                if (xNew == xRandom.get(i) && yNew == yRandom.get(i)) {
+                    isMined = true;
+                    break;
+                }
+            }
+            if (isMined) {
+                continue;
+            }
+            boundaryCheck(xNew, yNew);
+
+            if (surroundingIndividual == 0) {
+                for (int j = -1; j <= 1; j++) {
+                    for (int k = -1; k <= 1; k++) {
+                        if (j == 0 && k == 0) {
+                            continue;
                         }
-                    }
-                    if (mineHere) {
-                        breakTime = true;
-                        break;
-                    }
-                    boundaryCheck(x+i, y+k);
-                    if (surroundingIndividual == 0){
-                        xFloodFill.add(x+i);
-                        yFloodFill.add(y+k);
-                    }
-                    else {
-                        breakTime = true;
-                        break;
+                        int xDoubleNew = xNew + j;
+                        int yDoubleNew = yNew + k;
+                        if (xDoubleNew < 0 || yDoubleNew < 0 || xDoubleNew >= (screenLength / bigTile) || yDoubleNew >= (screenWidth / bigTile)) {
+                            continue;
+                        }
+                        boolean innerMined = false;
+                        for (int l = 0; l < xRandom.size(); l++) {
+                            if (xDoubleNew == xRandom.get(l) && yDoubleNew == yRandom.get(l)) {
+                                innerMined = true;
+                                break;
+                            }
+                        }
+                        if (innerMined) {
+                            continue;
+                        }
+                    xFloodFill.add(xDoubleNew);
+                    yFloodFill.add(yDoubleNew);
                     }
                 }
             }
+            else {
+                continue;
+            }
         }
+
+        // while (!breakTime) {
+        //     for (int k = 0; k < (screenWidth / bigTile) - y; k++) {
+        //         for (int i = 0; i < (screenLength / bigTile) - x; i++) {
+        //             boolean mineHere = false;
+        //             for (int j = 0; j < xRandom.size(); j++) {
+        //                 if (x + i == xRandom.get(j) && y+k == yRandom.get(j)) {
+        //                     mineHere = true;
+        //                     breakTime = true;
+        //                     break;
+        //                 }
+        //             }
+        //             if (mineHere) {
+        //                 breakTime = true;
+        //                 break;
+        //             }
+        //             boundaryCheck(x+i, y+k);
+        //             if (surroundingIndividual == 0){
+        //                 xFloodFill.add(x+i);
+        //                 yFloodFill.add(y+k);
+        //             }
+        //             else {
+        //                 breakTime = true;
+        //                 break;
+        //             }
+        //         }
+        //     }
     }
     
     public void gameStatus() {
