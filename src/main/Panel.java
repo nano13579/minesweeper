@@ -1,5 +1,7 @@
 import javax.swing.JPanel;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Color;
@@ -35,6 +37,8 @@ public class Panel extends JPanel implements Runnable {
     private int surroundingIndividual;
     private int xCurrentFloodIndividual;
     private int yCurrentFloodIndividual;
+
+    private int mineAmount;
 
     ArrayList<Boolean> mineAdjacentBoolean = new ArrayList<>();
     ArrayList<Integer> xMineAdjacentSquares = new ArrayList<>();
@@ -112,6 +116,8 @@ public class Panel extends JPanel implements Runnable {
         super.paintComponent(graphics);
         Graphics2D graphics2 = (Graphics2D)graphics;
         int rowsOffset = 0;
+        Font numberFont = new Font("Arial", Font.BOLD, 36);
+        numberFont = numberFont.deriveFont(bigTile * 0.65f);
         //revealCells();
         for (int j = 0; j < screenWidth; j = j + bigTile) { // basic grid background
             if ((j / bigTile) % 2 == 0) {
@@ -161,8 +167,25 @@ public class Panel extends JPanel implements Runnable {
                     if (mineLocated) {
                     } 
                     else if (mineAdjacent) {
-                        graphics.setColor(Color.red);
-                        graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
+                        for (int k = 0; k < screenLength; k++) {
+                            for (int l = 0; l < screenWidth; k++) {
+                                graphics.setFont(numberFont);
+                                graphics.setColor(Color.black);
+                                FontMetrics fontMetrics = graphics.getFontMetrics();
+                                displayNumbers(k, l);
+                                String numberString = String.valueOf(surroundingIndividual);
+                                int textWidth = fontMetrics.stringWidth(numberString);
+                                int textHeight = fontMetrics.getAscent();
+                                int measureX = i * bigTile;
+                                int measureY = j * bigTile;
+                                int xCenter = measureX + (bigTile - textWidth) / 2;
+                                int yCenter = measureY + (bigTile - textHeight) / 2;
+
+                                graphics.drawString(numberString, xCenter, yCenter);
+                            }
+                        }
+                        // graphics.setColor(Color.red);
+                        // graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
                     } else {
                         // graphics.setColor(Color.orange);
                         // graphics.fillRect(i * bigTile, j*bigTile, bigTile, bigTile);
@@ -230,7 +253,21 @@ public class Panel extends JPanel implements Runnable {
             }
         }
     }
-    
+    public void displayNumbers(int x, int y) {
+        mineAmount = 0;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; i++) {
+                for (int k = 0; k < xRandom.size(); k++){
+                    for (int l = 0; l < yRandom.size(); l++) {
+                        if (x + i == xRandom.get(k) && y + j == yRandom.get(l)) {
+                            mineAmount++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void boundaryCheck(int x, int y) {
         
         ArrayList<Integer> xEightCheck = new ArrayList<>(); // checking eight surrounding squares for mines
@@ -275,6 +312,9 @@ public class Panel extends JPanel implements Runnable {
             }
                 
         }
+        // for (int i = 0; i < xMineAdjacentSquares.size(); i++) {
+
+        // }
     }
 
     public void revealCells(int x, int y) {
