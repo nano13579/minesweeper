@@ -1,4 +1,6 @@
 import javax.swing.JPanel;
+import javax.swing.Timer;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -37,8 +39,6 @@ public class Panel extends JPanel implements Runnable {
     private int surroundingIndividual;
     private int xCurrentFloodIndividual;
     private int yCurrentFloodIndividual;
-
-    private int mineAmount;
 
     ArrayList<Boolean> mineAdjacentBoolean = new ArrayList<>();
     ArrayList<Integer> xMineAdjacentSquares = new ArrayList<>();
@@ -109,6 +109,17 @@ public class Panel extends JPanel implements Runnable {
                 e.printStackTrace();
             }
         }
+        Timer timer = new Timer(800, e -> {
+            if (!gameOn) {
+                repaint();
+            }
+            else {
+                ((Timer)e.getSource()).stop();
+            }
+        });
+        timer.setRepeats(true);
+        timer.start();
+
     }
 
     public void update() {
@@ -124,10 +135,10 @@ public class Panel extends JPanel implements Runnable {
         numberFont = numberFont.deriveFont(bigTile * 0.65f);
         if (!gameOn) {
             graphics.setColor(Color.black);
-            graphics.fillRect(0, 0, screenWidth, screenWidth);
+            graphics.fillRect(0, 0, screenLength, screenWidth);
             graphics.setColor(Color.red);
             graphics.setFont(numberFont);
-            graphics.drawString("GAME OVER", screenLength / 2, screenWidth / 2);
+            graphics.drawString("GAME OVER", (int)(Math.random() * screenLength), (int)(Math.random() * screenWidth));
         }
         //revealCells();
         else {
@@ -150,7 +161,7 @@ public class Panel extends JPanel implements Runnable {
             }
 
             if (zeroSurroundingMinesCheck) { // if no adjacent mines use revealCells for flood fill
-                graphics2.setColor(Color.yellow); // yellow = no mines in adjacent 8 squares 
+                graphics2.setColor(lightBrownSquare); // yellow = no mines in adjacent 8 squares 
                 graphics.fillRect(xCurrentFloodIndividual * bigTile, yCurrentFloodIndividual * bigTile, bigTile, bigTile);
             }
 
@@ -233,7 +244,7 @@ public class Panel extends JPanel implements Runnable {
                 graphics2.fillRect(xSquareSelect, ySquareSelect, bigTile, bigTile);
                 }
 
-                graphics.setColor(Color.orange);
+                graphics.setColor(lightBrownSquare);
                 
                 for (int i = 0; i < xDraw.size(); i++) {
                     if (xDraw.get(i) != null && yDraw.get(i) != null){
